@@ -150,6 +150,26 @@
 <script setup>
 import { ref, reactive, onMounted, nextTick, watch } from 'vue'
 
+// 存储服务兼容层
+const storageService = {
+  async setItem(key, value) {
+    if (window.services && window.services.storage) {
+      return window.services.storage.setItem(key, JSON.parse(JSON.stringify(value)))
+    } else {
+      localStorage.setItem(key, JSON.stringify(value))
+      return Promise.resolve()
+    }
+  },
+  async getItem(key) {
+    if (window.services && window.services.storage) {
+      return window.services.storage.getItem(key)
+    } else {
+      const value = localStorage.getItem(key)
+      return value ? JSON.parse(value) : null
+    }
+  }
+}
+
 // 列定义
 const columns = ref([
   { key: 'todo', title: '待办', icon: '📝', dragOver: false },
@@ -182,10 +202,10 @@ const generateId = () => {
 }
 
 // 初始化数据
-const initializeData = () => {
-  const savedTasks = localStorage.getItem('kanban-tasks')
+const initializeData = async () => {
+  const savedTasks = await storageService.getItem('kanban-tasks')
   if (savedTasks) {
-    tasks.value = JSON.parse(savedTasks)
+    tasks.value = savedTasks
   } else {
     // 默认示例任务
     tasks.value = [
@@ -208,19 +228,19 @@ const initializeData = () => {
       {
         id: generateId(),
         title: '数据持久化',
-        description: '所有操作都会自动保存到本地存储中',
+        description: '所有操作都会自动保存到uTools数据库中，重启uTools后数据依然存在',
         priority: 'low',
         column: 'done',
         createdAt: new Date().toISOString()
       }
     ]
   }
-  saveData()
+  await saveData()
 }
 
-// 保存数据到localStorage
-const saveData = () => {
-  localStorage.setItem('kanban-tasks', JSON.stringify(tasks.value))
+// 保存数据到uTools数据库
+const saveData = async () => {
+  await storageService.setItem('kanban-tasks', tasks.value)
 }
 
 // 获取指定列的任务
@@ -298,7 +318,7 @@ const handleDragLeave = (column) => {
 }
 
 // 拖拽放置
-const handleDrop = (event, targetColumn) => {
+const handleDrop = async (event, targetColumn) => {
   event.preventDefault()
   
   if (draggedTask.value) {
@@ -311,7 +331,7 @@ const handleDrop = (event, targetColumn) => {
       const taskIndex = tasks.value.findIndex(t => t.id === draggedTask.value.id)
       if (taskIndex !== -1) {
         tasks.value[taskIndex].column = toColumn
-        saveData()
+        await saveData()
         
         // 添加磁吸效果动画
         const columnElement = event.currentTarget
@@ -355,7 +375,7 @@ const closeTaskModal = () => {
 }
 
 // 保存任务
-const saveTask = () => {
+const saveTask = async () => {
   if (!taskForm.title.trim()) return
   
   if (editingTask.value) {
@@ -383,7 +403,7 @@ const saveTask = () => {
     tasks.value.push(newTask)
   }
   
-  saveData()
+  await saveData()
   closeTaskModal()
 }
 
@@ -404,12 +424,12 @@ const deleteTask = () => {
 }
 
 // 确认删除任务
-const confirmDeleteTask = () => {
+const confirmDeleteTask = async () => {
   if (editingTask.value) {
     const taskIndex = tasks.value.findIndex(t => t.id === editingTask.value.id)
     if (taskIndex !== -1) {
       tasks.value.splice(taskIndex, 1)
-      saveData()
+      await saveData()
     }
     closeTaskModal()
   }
