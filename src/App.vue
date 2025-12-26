@@ -3,9 +3,16 @@
     <div class="header">
       <h1>任务看板</h1>
       <p></p>
-      <button class="header-add-btn" @click="openTaskModal('todo')">
-        + 添加任务
-      </button>
+      <div class="header-actions">
+        <select v-model="currentTheme" @change="changeTheme" class="theme-selector">
+          <option value="black-gold">黑金主题</option>
+          <option value="github-light">GitHub 亮色</option>
+          <option value="github-dark">GitHub 暗色</option>
+        </select>
+        <button class="header-add-btn" @click="openTaskModal('todo')">
+          + 添加任务
+        </button>
+      </div>
     </div>
     
     <div class="kanban-board">
@@ -167,6 +174,24 @@ const storageService = {
       const value = localStorage.getItem(key)
       return value ? JSON.parse(value) : null
     }
+  }
+}
+
+// 主题相关
+const currentTheme = ref('black-gold')
+
+// 切换主题
+const changeTheme = async () => {
+  document.documentElement.setAttribute('data-theme', currentTheme.value)
+  await storageService.setItem('kanban-theme', currentTheme.value)
+}
+
+// 初始化主题
+const initializeTheme = async () => {
+  const savedTheme = await storageService.getItem('kanban-theme')
+  if (savedTheme) {
+    currentTheme.value = savedTheme
+    document.documentElement.setAttribute('data-theme', savedTheme)
   }
 }
 
@@ -444,7 +469,8 @@ const cancelDeleteTask = () => {
 }
 
 // 组件挂载时初始化数据
-onMounted(() => {
+onMounted(async () => {
+  await initializeTheme()
   initializeData()
 })
 

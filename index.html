@@ -11,9 +11,109 @@
             box-sizing: border-box;
         }
         
+        /* 黑金主题（默认） */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #1a1a1a 0%, #2d1810 50%, #8b6914 100%);
+            --text-primary: #ffd700;
+            --text-secondary: #f0f0f0;
+            --text-muted: #888;
+            --bg-column: linear-gradient(145deg, rgba(40, 40, 40, 0.95) 0%, rgba(20, 20, 20, 0.98) 100%);
+            --bg-column-hover: rgba(40, 40, 40, 0.98);
+            --bg-task: linear-gradient(145deg, rgba(60, 60, 60, 0.95) 0%, rgba(40, 40, 40, 0.98) 100%);
+            --bg-task-hover: rgba(60, 60, 60, 0.98);
+            --bg-modal: linear-gradient(145deg, rgba(40, 40, 40, 0.98) 0%, rgba(20, 20, 20, 1) 100%);
+            --bg-input: rgba(20, 20, 20, 0.8);
+            --bg-btn-primary: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #8b6914 100%);
+            --bg-btn-secondary: rgba(40, 40, 40, 0.8);
+            --bg-btn-danger: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            --border-color: rgba(255, 215, 0, 0.1);
+            --border-focus: #ffd700;
+            --shadow-color: rgba(139, 105, 20, 0.2);
+            --shadow-gold: rgba(255, 215, 0, 0.3);
+            --priority-high-bg: linear-gradient(135deg, #8b0000 0%, #dc143c 100%);
+            --priority-high-text: #ffd700;
+            --priority-medium-bg: linear-gradient(135deg, #8b6914 0%, #daa520 100%);
+            --priority-medium-text: #1a1a1a;
+            --priority-low-bg: linear-gradient(135deg, #2d5016 0%, #228b22 100%);
+            --priority-low-text: #98fb98;
+            --column-count-bg: linear-gradient(135deg, #8b6914 0%, #daa520 100%);
+            --column-count-text: #1a1a1a;
+            --delete-btn-bg: rgba(220, 53, 69, 0.15);
+            --delete-btn-text: #dc3545;
+            --delete-btn-hover-bg: rgba(220, 53, 69, 0.8);
+            --delete-btn-hover-text: white;
+        }
+        
+        /* GitHub 亮色主题 */
+        [data-theme="github-light"] {
+            --bg-gradient: linear-gradient(135deg, #f6f8fa 0%, #e1e4e8 50%, #d0d7de 100%);
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --text-muted: #8c959f;
+            --bg-column: linear-gradient(145deg, #ffffff 0%, #f6f8fa 100%);
+            --bg-column-hover: #ffffff;
+            --bg-task: linear-gradient(145deg, #ffffff 0%, #f6f8fa 100%);
+            --bg-task-hover: #ffffff;
+            --bg-modal: linear-gradient(145deg, #ffffff 0%, #f6f8fa 100%);
+            --bg-input: #ffffff;
+            /* --bg-btn-primary: linear-gradient(135deg, #141414 0%, #141414 50%, #19191a 100%); */
+            --bg-btn-primary: linear-gradient(135deg, #238636 0%, #2ea043 50%, #3fb950 100%);
+            --bg-btn-secondary: #f6f8fa;
+            --bg-btn-danger: linear-gradient(135deg, #da3633 0%, #cf222e 100%);
+            --border-color: #d0d7de;
+            --border-focus: #0969da;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --shadow-gold: rgba(0, 0, 0, 0.15);
+            --priority-high-bg: linear-gradient(135deg, #cf222e 0%, #da3633 100%);
+            --priority-high-text: #ffffff;
+            --priority-medium-bg: linear-gradient(135deg, #d29922 0%, #e3b341 100%);
+            --priority-medium-text: #1f2328;
+            --priority-low-bg: linear-gradient(135deg, #1a7f37 0%, #238636 100%);
+            --priority-low-text: #ffffff;
+            --column-count-bg: #0969da;
+            --column-count-text: #ffffff;
+            --delete-btn-bg: rgba(207, 34, 46, 0.1);
+            --delete-btn-text: #cf222e;
+            --delete-btn-hover-bg: #cf222e;
+            --delete-btn-hover-text: white;
+        }
+        
+        /* GitHub 暗色主题 */
+        [data-theme="github-dark"] {
+            --bg-gradient: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #21262d 100%);
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --bg-column: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
+            --bg-column-hover: #161b22;
+            --bg-task: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
+            --bg-task-hover: #161b22;
+            --bg-modal: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
+            --bg-input: #0d1117;
+            --bg-btn-primary: linear-gradient(135deg, #238636 0%, #2ea043 50%, #3fb950 100%);
+            --bg-btn-secondary: #21262d;
+            --bg-btn-danger: linear-gradient(135deg, #da3633 0%, #f85149 100%);
+            --border-color: #30363d;
+            --border-focus: #58a6ff;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --shadow-gold: rgba(0, 0, 0, 0.4);
+            --priority-high-bg: linear-gradient(135deg, #da3633 0%, #f85149 100%);
+            --priority-high-text: #ffffff;
+            --priority-medium-bg: linear-gradient(135deg, #d29922 0%, #e3b341 100%);
+            --priority-medium-text: #0d1117;
+            --priority-low-bg: linear-gradient(135deg, #238636 0%, #3fb950 100%);
+            --priority-low-text: #ffffff;
+            --column-count-bg: #58a6ff;
+            --column-count-text: #0d1117;
+            --delete-btn-bg: rgba(218, 54, 51, 0.1);
+            --delete-btn-text: #f85149;
+            --delete-btn-hover-bg: #da3633;
+            --delete-btn-hover-text: white;
+        }
+        
         body {
             font-family: 'Microsoft YaHei', Arial, sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d1810 50%, #8b6914 100%);
+            background: var(--bg-gradient);
             min-height: 100vh;
             padding: 20px;
         }
@@ -26,7 +126,7 @@
         .header {
             text-align: center;
             margin-bottom: 30px;
-            color: white;
+            color: var(--text-secondary);
             position: relative;
         }
         
@@ -34,7 +134,7 @@
             font-size: 2.5rem;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #8b6914 100%);
+            background: var(--bg-btn-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -43,16 +143,43 @@
         .header p {
             font-size: 1.1rem;
             opacity: 0.9;
-            color: #f0f0f0;
+            color: var(--text-secondary);
             text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
         }
         
-        .header-add-btn {
+        .header-actions {
             position: absolute;
             top: 0;
             right: 0;
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #8b6914 100%);
-            color: #000;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .theme-selector {
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .theme-selector:hover {
+            border-color: var(--border-focus);
+        }
+        
+        .theme-selector:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 10px var(--shadow-gold);
+        }
+        
+        .header-add-btn {
+            background: var(--bg-btn-primary);
+            color: #000000de;
             border: none;
             padding: 12px 24px;
             border-radius: 8px;
@@ -60,12 +187,12 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+            box-shadow: 0 4px 12px var(--shadow-gold);
         }
         
         .header-add-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(255, 215, 0, 0.4);
+            box-shadow: 0 6px 16px var(--shadow-gold);
         }
         
         .header-add-btn:active {
@@ -84,9 +211,9 @@
         }
         
         .column {
-            background: linear-gradient(145deg, rgba(40, 40, 40, 0.95) 0%, rgba(20, 20, 20, 0.98) 100%);
+            background: var(--bg-column);
             border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(139, 105, 20, 0.2), inset 0 1px 0 rgba(255, 215, 0, 0.1);
+            box-shadow: 0 8px 32px var(--shadow-color), inset 0 1px 0 rgba(255, 215, 0, 0.1);
             backdrop-filter: blur(10px);
             padding: 20px;
             min-height: 600px;
@@ -94,7 +221,7 @@
             flex: 1;
             min-width: 200px;
             max-width: none;
-            border: 1px solid rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--border-color);
         }
         
         .column.drag-over {
@@ -108,7 +235,7 @@
             justify-content: space-between;
             margin-bottom: 20px;
             padding-bottom: 15px;
-            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+            border-bottom: 2px solid var(--border-color);
             flex-wrap: wrap;
             gap: 10px;
         }
@@ -116,7 +243,7 @@
         .column-title {
             font-size: 1.4rem;
             font-weight: 600;
-            color: #ffd700;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -124,17 +251,17 @@
         }
         
         .column-count {
-            background: linear-gradient(135deg, #8b6914 0%, #daa520 100%);
-            color: #1a1a1a;
+            background: var(--column-count-bg);
+            color: var(--column-count-text);
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 0.9rem;
             font-weight: 600;
-            box-shadow: 0 2px 4px rgba(139, 105, 20, 0.3);
+            box-shadow: 0 2px 4px var(--shadow-color);
         }
         
         .add-task-btn {
-            background: linear-gradient(135deg, #8b6914 0%, #daa520 50%, #ffd700 100%);
+            background: var(--bg-btn-primary);
             color: #1a1a1a;
             border: none;
             padding: 8px 16px;
@@ -143,13 +270,12 @@
             font-size: 0.9rem;
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(139, 105, 20, 0.3);
+            box-shadow: 0 2px 8px var(--shadow-color);
         }
         
         .add-task-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
-            background: linear-gradient(135deg, #daa520 0%, #ffd700 50%, #ffed4e 100%);
+            box-shadow: 0 4px 12px var(--shadow-gold);
         }
         
         .task-list {
@@ -158,7 +284,7 @@
         }
         
         .task-item {
-            background: linear-gradient(145deg, rgba(60, 60, 60, 0.95) 0%, rgba(40, 40, 40, 0.98) 100%);
+            background: var(--bg-task);
             border-radius: 8px;
             padding: 12px;
             margin-bottom: 12px;
@@ -172,16 +298,16 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             hyphens: auto;
-            border: 1px solid rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--border-color);
         }
         
         .task-delete-btn {
             position: absolute;
             top: 6px;
             right: 6px;
-            background: rgba(220, 53, 69, 0.15);
-            border: 1px solid rgba(220, 53, 69, 0.4);
-            color: #dc3545;
+            background: var(--delete-btn-bg);
+            border: 1px solid var(--border-color);
+            color: var(--delete-btn-text);
             width: 16px;
             height: 16px;
             border-radius: 3px;
@@ -197,15 +323,15 @@
         }
         
         .task-delete-btn:hover {
-            background: rgba(220, 53, 69, 0.8);
-            color: white;
+            background: var(--delete-btn-hover-bg);
+            color: var(--delete-btn-hover-text);
             transform: scale(1.1);
         }
         
         .task-item:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(255, 215, 0, 0.2);
-            border-left-color: #ffd700;
+            box-shadow: 0 4px 16px var(--shadow-gold);
+            border-left-color: var(--text-primary);
         }
         
         .task-item.dragging {
@@ -215,14 +341,14 @@
         }
         
         .task-item.drop-target {
-            border-left-color: #ffd700;
-            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+            border-left-color: var(--text-primary);
+            box-shadow: 0 4px 20px var(--shadow-gold);
         }
         
         .task-title {
             font-size: 1rem;
             font-weight: 600;
-            color: #ffd700;
+            color: var(--text-primary);
             margin-bottom: 6px;
             word-break: break-word;
             line-height: 1.3;
@@ -231,7 +357,7 @@
         }
         
         .task-description {
-            color: #cccccc;
+            color: var(--text-secondary);
             font-size: 0.85rem;
             margin-bottom: 10px;
             line-height: 1.4;
@@ -250,7 +376,7 @@
             justify-content: space-between;
             align-items: center;
             font-size: 0.8rem;
-            color: #888;
+            color: var(--text-muted);
             flex-wrap: wrap;
             gap: 8px;
         }
@@ -264,18 +390,18 @@
         }
         
         .priority-high {
-            background: linear-gradient(135deg, #8b0000 0%, #dc143c 100%);
-            color: #ffd700;
+            background: var(--priority-high-bg);
+            color: var(--priority-high-text);
         }
         
         .priority-medium {
-            background: linear-gradient(135deg, #8b6914 0%, #daa520 100%);
-            color: #1a1a1a;
+            background: var(--priority-medium-bg);
+            color: var(--priority-medium-text);
         }
         
         .priority-low {
-            background: linear-gradient(135deg, #2d5016 0%, #228b22 100%);
-            color: #98fb98;
+            background: var(--priority-low-bg);
+            color: var(--priority-low-text);
         }
         
         .modal {
@@ -292,15 +418,15 @@
         }
         
         .modal-content {
-            background: linear-gradient(145deg, rgba(40, 40, 40, 0.98) 0%, rgba(20, 20, 20, 1) 100%);
+            background: var(--bg-modal);
             padding: 30px;
             border-radius: 12px;
             max-width: 500px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            box-shadow: 0 20px 60px rgba(139, 105, 20, 0.3), 0 0 40px rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 60px var(--shadow-color), 0 0 40px var(--shadow-gold);
         }
         
         .modal-header {
@@ -309,13 +435,13 @@
             align-items: center;
             margin-bottom: 20px;
             padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            border-bottom: 1px solid var(--border-color);
         }
         
         .modal-title {
             font-size: 1.3rem;
             font-weight: 600;
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #8b6914 100%);
+            background: var(--bg-btn-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -326,7 +452,7 @@
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
-            color: #ffd700;
+            color: var(--text-primary);
             padding: 5px;
         }
         
@@ -338,24 +464,24 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: #ffd700;
+            color: var(--text-primary);
         }
         
         .form-input {
             width: 100%;
             padding: 12px;
-            border: 2px solid rgba(255, 215, 0, 0.2);
+            border: 2px solid var(--border-color);
             border-radius: 8px;
             font-size: 1rem;
             transition: border-color 0.3s ease;
-            background: rgba(20, 20, 20, 0.8);
-            color: #fff;
+            background: var(--bg-input);
+            color: var(--text-primary);
         }
         
         .form-input:focus {
             outline: none;
-            border-color: #ffd700;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            border-color: var(--border-focus);
+            box-shadow: 0 0 10px var(--shadow-gold);
         }
         
         .form-textarea {
@@ -378,7 +504,7 @@
             justify-content: flex-end;
             margin-top: 30px;
             padding-top: 20px;
-            border-top: 1px solid rgba(255, 215, 0, 0.2);
+            border-top: 1px solid var(--border-color);
         }
         
         .btn {
@@ -391,20 +517,20 @@
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #8b6914 100%);
+            background: var(--bg-btn-primary);
             color: #000;
             font-weight: 600;
         }
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+            box-shadow: 0 4px 12px var(--shadow-gold);
         }
         
         .btn-secondary {
-            background: rgba(40, 40, 40, 0.8);
-            color: #ffd700;
-            border: 1px solid rgba(255, 215, 0, 0.3);
+            background: var(--bg-btn-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
         }
         
         .btn-secondary:hover {
@@ -412,7 +538,7 @@
         }
         
         .btn-danger {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            background: var(--bg-btn-danger);
             color: white;
         }
         
@@ -447,20 +573,20 @@
         
         .delete-message {
             font-size: 1.2rem;
-            color: #ffd700;
+            color: var(--text-primary);
             margin-bottom: 10px;
             font-weight: 600;
         }
         
         .delete-warning {
             font-size: 0.9rem;
-            color: #999;
+            color: var(--text-muted);
             margin: 0;
         }
         
         .empty-state {
             text-align: center;
-            color: #999;
+            color: var(--text-muted);
             font-size: 1.1rem;
             margin-top: 50px;
         }
@@ -514,6 +640,11 @@
             
             .header h1 {
                 font-size: 2rem;
+            }
+            
+            .header-actions {
+                flex-direction: column;
+                gap: 8px;
             }
         }
     </style>
