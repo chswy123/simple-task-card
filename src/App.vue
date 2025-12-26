@@ -35,20 +35,22 @@
         
         <div class="task-list">
           <div 
-            v-for="task in getTasksByColumn(column.key)" 
+            v-for="(task, index) in getTasksByColumn(column.key)" 
             :key="task.id"
             class="task-item"
             :class="{ 
               'dragging': draggedTask && draggedTask.id === task.id,
-              'drop-target': column.dragOver 
+              'drop-target': dropTargetTask && dropTargetTask.id === task.id
             }"
             :style="{ 
               borderLeftColor: getPriorityColor(task.priority),
               transform: draggedTask && draggedTask.id === task.id ? 'rotate(5deg)' : 'none'
             }"
             draggable="true"
-            @dragstart="handleDragStart($event, task)"
+            @dragstart="handleDragStart($event, task, column.key, index)"
             @dragend="handleDragEnd"
+            @dragover="handleTaskDragOver($event, task, column.key)"
+            @dragleave="handleTaskDragLeave"
             @click="editTask(task)"
           >
             <button class="task-delete-btn" @click.stop="deleteTaskDirect(task)">×</button>
@@ -207,6 +209,9 @@ const tasks = ref([])
 
 // 拖拽相关
 const draggedTask = ref(null)
+const dragSourceColumn = ref(null)
+const dragSourceIndex = ref(null)
+const dropTargetTask = ref(null)
 
 // 模态框状态
 const showTaskModal = ref(false)
@@ -317,8 +322,10 @@ const formatDate = (dateString) => {
 }
 
 // 拖拽开始
-const handleDragStart = (event, task) => {
+const handleDragStart = (event, task, column, index) => {
   draggedTask.value = task
+  dragSourceColumn.value = column
+  dragSourceIndex.value = index
   event.dataTransfer.effectAllowed = 'move'
   event.target.classList.add('dragging')
 }
@@ -327,6 +334,9 @@ const handleDragStart = (event, task) => {
 const handleDragEnd = (event) => {
   event.target.classList.remove('dragging')
   draggedTask.value = null
+  dragSourceColumn.value = null
+  dragSourceIndex.value = null
+  dropTargetTask.value = null
   columns.value.forEach(column => column.dragOver = false)
 }
 
@@ -335,6 +345,20 @@ const handleDragOver = (event, column) => {
   event.preventDefault()
   event.dataTransfer.dropEffect = 'move'
   column.dragOver = true
+}
+
+// 任务拖拽悬停
+const handleTaskDragOver = (event, task, column) => {
+  event.preventDefault()
+  event.stopPropagation()
+  if (draggedTask.value && draggedTask.value.id !== task.id) {
+    dropTargetTask.value = task
+  }
+}
+
+// 任务拖拽离开
+const handleTaskDragLeave = () => {
+  dropTargetTask.value = null
 }
 
 // 拖拽离开
@@ -347,18 +371,32 @@ const handleDrop = async (event, targetColumn) => {
   event.preventDefault()
   
   if (draggedTask.value) {
-    const fromColumn = draggedTask.value.column
+    const fromColumn = dragSourceColumn.value
     const toColumn = targetColumn.key
-    const wasMoved = fromColumn !== toColumn
+    const fromIndex = dragSourceIndex.value
     
-    if (wasMoved) {
-      // 更新任务列
+    if (dropTargetTask.value && fromColumn === toColumn) {
+      // 同列内排序
+      const columnTasks = getTasksByColumn(toColumn)
+      const targetIndex = columnTasks.findIndex(t => t.id === dropTargetTask.value.id)
+      
+      if (targetIndex !== -1 && fromIndex !== targetIndex) {
+        const task = tasks.value.find(t => t.id === draggedTask.value.id)
+        if (task) {
+          columnTasks.splice(fromIndex, 1)
+          columnTasks.splice(targetIndex, 0, task)
+          
+          tasks.value = tasks.value.filter(t => t.column !== toColumn).concat(columnTasks)
+          await saveData()
+        }
+      }
+    } else if (fromColumn !== toColumn) {
+      // 跨列移动
       const taskIndex = tasks.value.findIndex(t => t.id === draggedTask.value.id)
       if (taskIndex !== -1) {
         tasks.value[taskIndex].column = toColumn
         await saveData()
         
-        // 添加磁吸效果动画
         const columnElement = event.currentTarget
         columnElement.style.transform = 'scale(1.05)'
         setTimeout(() => {
@@ -368,8 +406,10 @@ const handleDrop = async (event, targetColumn) => {
     }
   }
   
-  // 清除拖拽状态
   draggedTask.value = null
+  dragSourceColumn.value = null
+  dragSourceIndex.value = null
+  dropTargetTask.value = null
   columns.value.forEach(column => column.dragOver = false)
 }
 
