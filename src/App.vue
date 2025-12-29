@@ -31,6 +31,22 @@
             <span>{{ column.title }}</span>
             <span class="column-count">{{ getTaskCount(column.key) }}</span>
           </div>
+          <div class="column-actions" v-if="getTaskCount(column.key) > 0" v-show="!isBatchSelectMode || currentBatchColumn?.key !== column.key">
+            <button class="column-action-btn" @click="handleBatchDeleteClick(column)" title="批量删除">
+              🗑️
+            </button>
+            <button class="column-action-btn" @click="clearColumnTasks(column)" title="清空当前列">
+              ✖
+            </button>
+          </div>
+          <div class="column-actions batch-mode-actions" v-if="getTaskCount(column.key) > 0" v-show="isBatchSelectMode && currentBatchColumn?.key === column.key">
+            <button class="column-action-btn btn-delete" @click="confirmBatchDeleteFromHeader" :disabled="selectedTaskIds.length === 0">
+              删除 ({{ selectedTaskIds.length }})
+            </button>
+            <button class="column-action-btn btn-cancel" @click="exitBatchSelectMode">
+              取消
+            </button>
+          </div>
         </div>
         
         <div class="task-list">
@@ -40,7 +56,9 @@
             class="task-item"
             :class="{ 
               'dragging': draggedTask && draggedTask.id === task.id,
-              'drop-target': dropTargetTask && dropTargetTask.id === task.id
+              'drop-target': dropTargetTask && dropTargetTask.id === task.id,
+              'selected': isTaskSelected(task.id),
+              'batch-mode': isBatchSelectMode && currentBatchColumn?.key === column.key
             }"
             :style="{ 
               borderLeftColor: getPriorityColor(task.priority),
@@ -51,8 +69,13 @@
             @dragend="handleDragEnd"
             @dragover="handleTaskDragOver($event, task, column.key)"
             @dragleave="handleTaskDragLeave"
-            @click="editTask(task)"
+            @click="handleTaskClick(task, column)"
           >
+            <div class="task-checkbox" v-if="isBatchSelectMode && currentBatchColumn?.key === column.key" @click.stop="toggleTaskSelect(task)">
+              <div class="checkbox-box" :class="{ checked: isTaskSelected(task.id) }">
+                <span v-if="isTaskSelected(task.id)">✓</span>
+              </div>
+            </div>
             <button class="task-delete-btn" @click.stop="deleteTaskDirect(task)">×</button>
             <div class="task-title">{{ task.title }}</div>
             <div class="task-description" v-if="task.description">{{ task.description }}</div>
@@ -152,6 +175,56 @@
       </div>
     </div>
 
+    <!-- 清空列确认模态框 -->
+    <div v-if="showClearColumnModal" class="modal" @click="cancelClearColumn">
+      <div class="modal-content modal-delete" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">确认清空</h3>
+          <button class="close-btn" @click="cancelClearColumn">×</button>
+        </div>
+        
+        <div class="delete-confirm-content">
+          <div class="delete-icon">⚠️</div>
+          <p class="delete-message">确定要清空 "{{ currentClearColumn?.title }}" 列的所有任务吗？</p>
+          <p class="delete-warning">此操作不可恢复</p>
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" @click="cancelClearColumn">
+            取消
+          </button>
+          <button type="button" class="btn btn-danger" @click="confirmClearColumn">
+            确认清空
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 批量删除确认模态框 -->
+    <div v-if="showBatchDeleteModal" class="modal" @click="cancelBatchDelete">
+      <div class="modal-content modal-delete" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">确认批量删除</h3>
+          <button class="close-btn" @click="cancelBatchDelete">×</button>
+        </div>
+        
+        <div class="delete-confirm-content">
+          <div class="delete-icon">⚠️</div>
+          <p class="delete-message">确定要删除选中的 {{ selectedTaskIds.length }} 个任务吗？</p>
+          <p class="delete-warning">此操作不可恢复</p>
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" @click="cancelBatchDelete">
+            取消
+          </button>
+          <button type="button" class="btn btn-danger" @click="confirmBatchDelete">
+            确认删除
+          </button>
+        </div>
+      </div>
+    </div>
+
 
   </div>
 </template>
@@ -216,7 +289,14 @@ const dropTargetTask = ref(null)
 // 模态框状态
 const showTaskModal = ref(false)
 const showDeleteModal = ref(false)
+const showClearColumnModal = ref(false)
+const showBatchDeleteModal = ref(false)
 const editingTask = ref(null)
+const currentClearColumn = ref(null)
+const currentBatchDeleteColumn = ref(null)
+const isBatchSelectMode = ref(false)
+const selectedTaskIds = ref([])
+const currentBatchColumn = ref(null)
 const taskForm = reactive({
   title: '',
   description: '',
@@ -508,6 +588,111 @@ const cancelDeleteTask = () => {
   editingTask.value = null
 }
 
+// 清空当前列任务
+const clearColumnTasks = (column) => {
+  currentClearColumn.value = column
+  showClearColumnModal.value = true
+}
+
+// 确认清空列任务
+const confirmClearColumn = async () => {
+  if (currentClearColumn.value) {
+    const columnKey = currentClearColumn.value.key
+    tasks.value = tasks.value.filter(task => task.column !== columnKey)
+    await saveData()
+  }
+  showClearColumnModal.value = false
+  currentClearColumn.value = null
+}
+
+// 取消清空列任务
+const cancelClearColumn = () => {
+  showClearColumnModal.value = false
+  currentClearColumn.value = null
+}
+
+// 处理批量删除按钮点击
+const handleBatchDeleteClick = (column) => {
+  if (isBatchSelectMode.value && currentBatchColumn.value?.key === column.key) {
+    // 如果当前在多选模式且是该列，弹出确认框
+    if (selectedTaskIds.value.length > 0) {
+      currentBatchDeleteColumn.value = column
+      showBatchDeleteModal.value = true
+    } else {
+      // 没有选中任何任务，取消多选模式
+      exitBatchSelectMode()
+    }
+  } else {
+    // 进入多选模式
+    enterBatchSelectMode(column)
+  }
+}
+
+// 进入多选模式
+const enterBatchSelectMode = (column) => {
+  isBatchSelectMode.value = true
+  currentBatchColumn.value = column
+  selectedTaskIds.value = []
+}
+
+// 退出多选模式
+const exitBatchSelectMode = () => {
+  isBatchSelectMode.value = false
+  currentBatchColumn.value = null
+  selectedTaskIds.value = []
+}
+
+// 处理任务点击
+const handleTaskClick = (task, column) => {
+  if (isBatchSelectMode.value && currentBatchColumn.value?.key === column.key) {
+    toggleTaskSelect(task)
+  } else {
+    editTask(task)
+  }
+}
+
+// 切换任务选择状态
+const toggleTaskSelect = (task) => {
+  const taskId = task.id
+  const index = selectedTaskIds.value.indexOf(taskId)
+  if (index === -1) {
+    selectedTaskIds.value.push(taskId)
+  } else {
+    selectedTaskIds.value.splice(index, 1)
+  }
+}
+
+// 从批量删除头部按钮确认删除
+const confirmBatchDeleteFromHeader = () => {
+  if (selectedTaskIds.value.length > 0 && currentBatchColumn.value) {
+    currentBatchDeleteColumn.value = currentBatchColumn.value
+    showBatchDeleteModal.value = true
+  }
+}
+
+// 检查任务是否被选中
+const isTaskSelected = (taskId) => {
+  return selectedTaskIds.value.includes(taskId)
+}
+
+// 确认批量删除
+const confirmBatchDelete = async () => {
+  if (selectedTaskIds.value.length > 0) {
+    tasks.value = tasks.value.filter(task => !selectedTaskIds.value.includes(task.id))
+    await saveData()
+  }
+  
+  showBatchDeleteModal.value = false
+  currentBatchDeleteColumn.value = null
+  exitBatchSelectMode()
+}
+
+// 取消批量删除
+const cancelBatchDelete = () => {
+  showBatchDeleteModal.value = false
+  currentBatchDeleteColumn.value = null
+}
+
 // 组件挂载时初始化数据
 onMounted(async () => {
   await initializeTheme()
@@ -516,3 +701,157 @@ onMounted(async () => {
 
 
 </script>
+
+<style scoped>
+.column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.column-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.column-action-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  opacity: 0.7;
+}
+
+.column-action-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="github-light"] .column-action-btn {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="github-light"] .column-action-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="github-dark"] .column-action-btn {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="github-dark"] .column-action-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="github-dark"] .btn-delete {
+  background: #ff6b6b;
+  color: white;
+}
+
+[data-theme="github-dark"] .btn-delete:hover {
+  background: #ff5252;
+}
+
+[data-theme="github-dark"] .btn-cancel {
+  background: rgba(255, 255, 255, 0.2);
+  color: #e1e4e8;
+}
+
+[data-theme="github-dark"] .btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+[data-theme="black-gold"] .btn-delete {
+  background: #c9302c;
+  color: #f5e6c4;
+}
+
+[data-theme="black-gold"] .btn-delete:hover {
+  background: #ac2925;
+}
+
+[data-theme="black-gold"] .btn-cancel {
+  background: rgba(245, 230, 196, 0.2);
+  color: #d4af37;
+}
+
+[data-theme="black-gold"] .btn-cancel:hover {
+  background: rgba(245, 230, 196, 0.3);
+  color: #f5e6c4;
+}
+
+.column-action-btn.active {
+  background: #667eea;
+  color: white;
+  opacity: 1;
+}
+
+.task-checkbox {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+}
+
+.checkbox-box {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.checkbox-box.checked {
+  background: #667eea;
+  border-color: #667eea;
+}
+
+.checkbox-box span {
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+[data-theme="github-light"] .checkbox-box {
+  border-color: rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="github-light"] .checkbox-box.checked {
+  background: #667eea;
+  border-color: #667eea;
+}
+
+[data-theme="github-dark"] .checkbox-box {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.task-item.selected {
+  border: 2px solid #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+  transform: scale(1.02);
+}
+
+.task-item.batch-mode {
+  padding-left: 36px;
+}
+
+.task-item.batch-mode:hover {
+  transform: scale(1.01);
+}
+
+.task-item.batch-mode.selected:hover {
+  transform: scale(1.02);
+}
+</style>
