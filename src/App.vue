@@ -33,10 +33,10 @@
           </div>
           <div class="column-actions" v-if="getTaskCount(column.key) > 0" v-show="!isBatchSelectMode || currentBatchColumn?.key !== column.key">
             <button class="column-action-btn" @click="handleBatchDeleteClick(column)" title="批量删除">
-              🗑️
+              ✖
             </button>
             <button class="column-action-btn" @click="clearColumnTasks(column)" title="清空当前列">
-              ✖
+              🗑️
             </button>
           </div>
           <div class="column-actions batch-mode-actions" v-if="getTaskCount(column.key) > 0" v-show="isBatchSelectMode && currentBatchColumn?.key === column.key">
