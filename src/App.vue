@@ -38,6 +38,9 @@
             <button class="column-action-btn" @click="clearColumnTasks(column)" title="清空当前列">
               🗑️
             </button>
+            <button v-if="column.key === 'done'" class="column-action-btn" @click="exportDoneTasks" title="导出">
+              📤
+            </button>
           </div>
           <div class="column-actions batch-mode-actions" v-if="getTaskCount(column.key) > 0" v-show="isBatchSelectMode && currentBatchColumn?.key === column.key">
             <button class="column-action-btn btn-delete" @click="confirmBatchDeleteFromHeader" :disabled="selectedTaskIds.length === 0">
@@ -691,6 +694,27 @@ const confirmBatchDelete = async () => {
 const cancelBatchDelete = () => {
   showBatchDeleteModal.value = false
   currentBatchDeleteColumn.value = null
+}
+
+// 导出已完成任务
+const exportDoneTasks = () => {
+  const doneTasks = getTasksByColumn('done')
+  if (doneTasks.length === 0) {
+    return
+  }
+  
+  const dataStr = JSON.stringify(doneTasks, null, 2)
+  const blob = new Blob([dataStr], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  const timestamp = new Date().toISOString().slice(0, 10)
+  
+  link.href = url
+  link.download = `done-tasks-${timestamp}.json`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
 }
 
 // 组件挂载时初始化数据
